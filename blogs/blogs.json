@@ -1,0 +1,16 @@
+{
+  "blogs": [
+    {
+      "shortName": "The Go Blog",
+      "name": "The Go Programming Language Blog",
+      "rss": "https://blog.golang.org/feed.atom",
+      "twitter": "golang"
+    },
+    {
+      "shortName": "developer2.0",
+      "name": "Bartłomiej Klimczak",
+      "rss": "https://developer20.com/index.xml",
+      "twitter": "kabanek"
+    }
+  ]
+}
