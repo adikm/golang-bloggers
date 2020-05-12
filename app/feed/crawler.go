@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func Crawler(url string, isAtom bool) {
+func GetFeed(url string, isAtom bool) []Entry {
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("Error GET: %v\n", err)
-		return
+		return nil
 	}
 	defer resp.Body.Close()
 
@@ -22,7 +22,7 @@ func Crawler(url string, isAtom bool) {
 	} else {
 		feedEntries = append(feedEntries, getRssEntries(*decoder)...)
 	}
-	fmt.Println(feedEntries)
+	return feedEntries
 }
 
 type Entry struct {

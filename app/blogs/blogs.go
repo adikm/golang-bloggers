@@ -2,13 +2,14 @@ package blogs
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"os"
+	"fmt"
+	"net/http"
 )
 
 type Blogs struct {
 	Blog []Blog `json:"blogs"`
 }
+
 type Blog struct {
 	ShortName string `json:"shortName"`
 	Name      string `json:"name"`
@@ -17,11 +18,11 @@ type Blog struct {
 
 func Get() Blogs {
 	var blogs Blogs
-	open, _ := os.Open("blogs/blogs.json")
-	dat, _ := ioutil.ReadAll(open)
-
-	_ = json.Unmarshal(dat, &blogs)
-
-	defer open.Close()
+	resp, err := http.Get("https://raw.githubusercontent.com/adikm/golang-bloggers/master/blogs/blogs.json")
+	if err != nil {
+		fmt.Printf("Error GET: %v\n", err)
+		return Blogs{}
+	}
+	_ = json.NewDecoder(resp.Body).Decode(&blogs)
 	return blogs
 }
