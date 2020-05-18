@@ -22,7 +22,19 @@ func GetFeed(url string, isAtom bool, entries chan []Entry) {
 	} else {
 		feedEntries = append(feedEntries, getRssEntries(*decoder)...)
 	}
-	entries <- feedEntries
+	entries <- filterLastWeekOnly(&feedEntries)
+}
+
+func filterLastWeekOnly(entries *[]Entry) []Entry {
+	weekAgo := time.Now().Add(-14 * 24 * time.Hour)
+	var lastWeekEntries []Entry
+	for _, entry := range *entries {
+		isWithinLastWeek := entry.Date.After(weekAgo)
+		if isWithinLastWeek {
+			lastWeekEntries = append(lastWeekEntries, entry)
+		}
+	}
+	return lastWeekEntries
 }
 
 type Entry struct {

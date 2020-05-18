@@ -6,7 +6,6 @@ import (
 	"github.com/adikm/golang-bloggers/app/feed"
 	"net/http"
 	"strings"
-	"time"
 )
 
 func InitServer() {
@@ -27,19 +26,6 @@ func feedHandler(w http.ResponseWriter, r *http.Request) {
 		go feed.GetFeed(blog.Rss, strings.HasSuffix(blog.Rss, "atom"), feedEntriesChannel)
 		feedEntries = append(feedEntries, <-feedEntriesChannel...)
 	}
-	lastWeekEntries := filterLastWeekOnly(&feedEntries)
-	response, _ := json.Marshal(lastWeekEntries)
+	response, _ := json.Marshal(feedEntries)
 	w.Write(response)
-}
-
-func filterLastWeekOnly(entries *[]feed.Entry) []feed.Entry {
-	weekAgo := time.Now().Add(-14 * 24 * time.Hour)
-	var lastWeekEntries []feed.Entry
-	for _, entry := range *entries {
-		isWithinLastWeek := entry.Date.After(weekAgo)
-		if isWithinLastWeek {
-			lastWeekEntries = append(lastWeekEntries, entry)
-		}
-	}
-	return lastWeekEntries
 }
