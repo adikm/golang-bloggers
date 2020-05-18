@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/adikm/golang-bloggers/app/blogs"
 	"github.com/adikm/golang-bloggers/app/feed"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func InitServer() {
@@ -20,10 +22,21 @@ func feedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	blogsList := blogs.Get()
 
+	feedEntriesChannel := make(chan []feed.Entry, len(blogsList.Blog))
 	var feedEntries []feed.Entry
 	for _, blog := range blogsList.Blog {
-		feedEntries = append(feedEntries, feed.GetFeed(blog.Rss, strings.HasSuffix(blog.Rss, "atom"))...)
+		go feed.GetFeed(blog.Rss, strings.HasSuffix(blog.Rss, "atom"), feedEntriesChannel)
+		feedEntries = append(feedEntries, <-feedEntriesChannel...)
 	}
+	filterLastWeekOnly(feedEntries)
 	response, _ := json.Marshal(feedEntries)
 	w.Write(response)
+}
+
+func filterLastWeekOnly(entries []feed.Entry) {
+	weekAgo := time.Now().Add(-14 * 24 * time.Hour)
+	for _, entry := range entries {
+		isWithinLastWeek := entry.Date.After(weekAgo)
+		fmt.Println(entry.Title, isWithinLastWeek)
+	}
 }

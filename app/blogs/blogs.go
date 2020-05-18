@@ -18,7 +18,7 @@ type Blog struct {
 
 func Get() Blogs {
 	var blogs Blogs
-	resp, err := http.Get("https://raw.githubusercontent.com/adikm/golang-bloggers/master/blogs/blogs.json")
+	resp, err := http.Get("https://raw.githubusercontent.com/adikm/golang-bloggers/master/app/blogs/blogs.json")
 	if err != nil {
 		fmt.Printf("Error GET: %v\n", err)
 		return Blogs{}

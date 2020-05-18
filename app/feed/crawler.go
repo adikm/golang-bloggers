@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func GetFeed(url string, isAtom bool) []Entry {
+func GetFeed(url string, isAtom bool, entries chan []Entry) {
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("Error GET: %v\n", err)
-		return nil
+		return
 	}
 	defer resp.Body.Close()
 
@@ -22,7 +22,7 @@ func GetFeed(url string, isAtom bool) []Entry {
 	} else {
 		feedEntries = append(feedEntries, getRssEntries(*decoder)...)
 	}
-	return feedEntries
+	entries <- feedEntries
 }
 
 type Entry struct {
