@@ -4,13 +4,22 @@
       "shortName": "The Go Blog",
       "name": "The Go Programming Language Blog",
       "rss": "https://blog.golang.org/feed.atom",
+      "atom": true,
       "twitter": "golang"
     },
     {
       "shortName": "developer2.0",
       "name": "Bartłomiej Klimczak",
       "rss": "https://developer20.com/index.xml",
+      "atom": false,
       "twitter": "kabanek"
+    },
+    {
+      "shortName": "Golang Code",
+      "name": "Golang Code",
+      "rss": "https://golangcode.com/index.xml",
+      "atom": true,
+      "twitter": "golangcode"
     }
   ]
 }
