@@ -2,30 +2,44 @@ package db
 
 import (
 	"context"
-	"fmt"
-	"github.com/jackc/pgx/v4"
-	"os"
+	"github.com/adikm/golang-bloggers/app/feed"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
+	"time"
 )
 
-var (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "admin"
-	dbname   = "bloggers"
-	conn     *pgx.Conn
-)
-
-func Connect() {
-	if conn != nil {
-		_ = conn.Close(context.Background())
-	}
+func connect() (*mongo.Client, context.Context) {
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	var err error
-	conn, err = pgx.Connect(context.Background(), fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname))
+	mongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
+	err = mongoClient.Ping(ctx, readpref.Primary())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return mongoClient, ctx
+}
+
+func InsertEntries(entries *[]feed.Entry) { // TODO make it a function for storing newsletter issues
+	mongoClient, ctx := connect()
+	collection := mongoClient.Database("bloggers").Collection("bloggers")
+	issue := NewsletterIssue{
+		Entries: *entries,
+		Date:    time.Now(),
+		Number:  0,
+	}
+	_, err := collection.InsertOne(ctx, issue)
+	if err != nil {
+		log.Println("Can't store")
+	}
+}
+
+type NewsletterIssue struct {
+	Entries []feed.Entry
+	Date    time.Time
+	Number  int
 }

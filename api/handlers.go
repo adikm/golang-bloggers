@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/adikm/golang-bloggers/app/blogs"
 	"github.com/adikm/golang-bloggers/app/feed"
+	"github.com/adikm/golang-bloggers/db"
 	"net/http"
 	"strings"
 )
@@ -26,6 +27,7 @@ func feedHandler(w http.ResponseWriter, r *http.Request) {
 		go feed.GetFeed(blog.Rss, strings.HasSuffix(blog.Rss, "atom"), feedEntriesChannel)
 		feedEntries = append(feedEntries, <-feedEntriesChannel...)
 	}
+	db.InsertEntries(&feedEntries)
 	response, _ := json.Marshal(feedEntries)
 	w.Write(response)
 }
